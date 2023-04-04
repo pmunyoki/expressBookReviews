@@ -35,24 +35,40 @@ regd_users.post("/login", (req,res) => {
     return res.status(404).json({message: "Error logging in"});
 }
 
-if (authenticatedUser(username,password)) {
-  let accessToken = jwt.sign({
-    data: password
-  }, 'access', { expiresIn: 60 * 60 });
+    if (authenticatedUser(username,password)) {
+    let accessToken = jwt.sign({
+        data: username
+    }, 'secret', { expiresIn: 60 * 60 });
 
-  req.session.authorization = {
-    accessToken,username
-}
- return res.status(200).send("User successfully logged in");
-} else {
-  return res.status(208).json({message: "Invalid Login. Check username and password"});
-}
-});
+    req.session.authorization = {
+        accessToken,username
+    }
+    return res.status(200).send("User successfully logged in");
+    } else {
+    return res.status(208).json({message: "Invalid Login. Check username and password"});
+    }
+    });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const username = req.session.authorization["username"]
+  let review = req.query.review
+  let isbn = req.params.isbn
+
+  if (Object.keys(books[isbn]["reviews"]).length===0){
+      //addedreviews.push({"username":username,"review":review})
+      //res.send("hello")
+      res.send.json("Your review has been succesfully added");
+  }
+  else {
+      //user = addedreviews["username"]
+      //if(user === username){
+          //addedreviews["username"] = review
+          res.send.json("Your review not added");
+      }
+     
+
+
 });
 
 module.exports.authenticated = regd_users;
