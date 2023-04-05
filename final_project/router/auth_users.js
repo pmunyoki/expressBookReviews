@@ -29,8 +29,8 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  const username = req.body.username
-  const password = req.body.password
+  const username = req.body.username;
+  const password = req.body.password;
   if (!username || !password) {
     return res.status(404).json({message: "Error logging in"});
 }
@@ -43,7 +43,7 @@ regd_users.post("/login", (req,res) => {
     req.session.authorization = {
         accessToken,username
     }
-    return res.status(200).send("User successfully logged in");
+    return res.status(200).json({message:"User successfully logged in"});
     } else {
     return res.status(208).json({message: "Invalid Login. Check username and password"});
     }
@@ -51,24 +51,37 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  const username = req.session.authorization["username"]
-  let review = req.query.review
-  let isbn = req.params.isbn
+  const username = req.session.authorization["username"];
+  let review = req.query.review;
+  let isbn = req.params.isbn;
 
-  if (Object.keys(books[isbn]["reviews"]).length===0){
-      //addedreviews.push({"username":username,"review":review})
-      //res.send("hello")
-      res.send.json("Your review has been succesfully added");
+  books[isbn]["reviews"][username] = review
+
+  if (books[isbn]["reviews"][username] === review){
+      
+    return res.status(201).json({message:"Your review has been succesfully added"});
   }
   else {
-      //user = addedreviews["username"]
-      //if(user === username){
-          //addedreviews["username"] = review
+      
           res.send.json("Your review not added");
       }
-     
 
 
+});
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const username = req.session.authorization["username"];
+    let isbn = req.params.isbn;
+    let reviews = books[isbn]["reviews"];
+    const hasKey = username in reviews
+    
+    if (hasKey){
+        delete(reviews[username]);
+        res.send("Your review has been succesfully deleted");
+    }else{
+        res.send("Your have not yet reviewed this book")
+    }
+
+   
 });
 
 module.exports.authenticated = regd_users;

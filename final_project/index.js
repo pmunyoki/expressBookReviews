@@ -12,18 +12,17 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 
 app.use("/customer/auth/*", function auth(req,res,next){
  if (req.session.authorization){
-    token = req.session.authorization["accessToken"]
-    try{
-        jwt.verify(token, 'secret');}
-        catch(e){
-    if (!err){
-        req.user = user
-        next()
-    }
+    token = req.session.authorization["accessToken"];
+    jwt.verify(token, 'secret', (err,user)=>{
+        if (!err){
+            req.user = user;
+            next();  
+        }
+     
      else{
         return res.status(403).json({message: "User not authenticated"})
-     }}
- }
+    }});
+    }
  else{
     return res.status(403).json({message: "Please login to continue"})
  }
