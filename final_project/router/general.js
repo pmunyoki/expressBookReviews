@@ -4,6 +4,9 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+const getAllBooks = () => Promise.resolve(JSON.stringify(books,null,4))
+const getBookIsbn = (isbn) => Promise.resolve(books[isbn])
+const getBookAuthor = (author) => Promise.resolve(books)
 
 public_users.post("/register", (req,res) => {
   const username = req.body.username
@@ -22,14 +25,18 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  res.send(JSON.stringify(books[1]["author"],null,4))
+  getAllBooks()
+  .then(result => res.status(200).send(result))
+  .catch(err => res.status(500).send(err));
   
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
   const isbn = req.params.isbn
-  res.send(books[isbn])
+  getBookIsbn(isbn)
+  .then(result => res.status(200).send(result))
+  .catch(err => res.status(500).send(err));
    });
   
 // Get book details based on author
