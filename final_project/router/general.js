@@ -6,7 +6,25 @@ const public_users = express.Router();
 
 const getAllBooks = () => Promise.resolve(JSON.stringify(books,null,4))
 const getBookIsbn = (isbn) => Promise.resolve(books[isbn])
-const getBookAuthor = (author) => Promise.resolve(books)
+const getBookAuthor = (author2) => {
+    let text = {};
+    for(var key in books){
+      var author = books[key]["author"]
+      if(author === author2 ){
+         text[key]=books[key]
+      }}
+    return Promise.resolve(text)}
+
+const getBookTitle = (title) => {
+    let text = {};
+    for(var key in books){
+        var title1 = books[key]["title"]
+        if(title === title1 ){
+           text[key]=books[key]
+        }}
+    return Promise.resolve(text)}
+    
+
 
 public_users.post("/register", (req,res) => {
   const username = req.body.username
@@ -42,34 +60,19 @@ public_users.get('/isbn/:isbn',function (req, res) {
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   const author2 = req.params.author
-  const keys = Object.keys(books)
-  let text = {}
-  for(var key in books){
-      var author = books[key]["author"]
-      if(author === author2 ){
-         text[key]=books[key]
-      }
+  getBookAuthor(author2)
+  .then(result => res.status(200).send(result))
+  .catch(err => res.status(500).send(err));
+   });
       
-  }
-  res.send(text)
-
-
- 
-});
-
+  
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const title = req.params.title
-    const keys = Object.keys(books)
-    let text = {}
-    for(var key in books){
-        var title1 = books[key]["title"]
-        if(title === title1 ){
-           text[key]=books[key]
-        }
-        
-    }
-    res.send(text)
+    getBookTitle(title)
+    .then(result => res.status(200).send(result))
+    .catch(err => res.status(500).send(err));
+    
   
 });
 
